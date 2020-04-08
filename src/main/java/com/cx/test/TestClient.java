@@ -18,5 +18,6 @@ public class TestClient {
         //3.调用服务中的方法
         String result = weatherServiceImplPort.queryWeatherByCityName("北京");
         System.out.println(result);
+        System.out.println("哈哈哈");
     }
 }
