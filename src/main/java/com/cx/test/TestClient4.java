@@ -10,24 +10,65 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
  * 注意不同的包：
+ *      <dependency>
+ *       <groupId>commons-httpclient</groupId>
+ *       <artifactId>commons-httpclient</artifactId>
+ *       <version>3.1</version>
+ *     </dependency>
  *  commons-httpclient   并入了 org.apache.httpcomponents » httpclient
  * httpClient方式调用webService服务(手机号信息查询)
  * 调用手机号信息查询接口
  */
 public class TestClient4 {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
 //            test01();//用httpClient以soap协议的形式调用webService服务(手机号信息查询)
 //            test02();//用httpClient以http  get的形式调用webService服务(手机号信息查询)
-            test03();//用httpClient以http  post的形式调用webService服务(手机号信息查询)
+//            test03();//用httpClient以http  post的形式调用webService服务(手机号信息查询)
+            test04();//用urlConnection的形式调用webService服务(手机号信息查询)
 
         }
+    /**
+     *
+     *  以urlConnection形式调用webService服务(手机号信息查询)
+     * 调用手机号信息查询接口
+     */
+    private static void test04() throws Exception {
+        URL url = new URL("http://ws.webxml.com.cn/WebServices/MobileCodeWS.asmx");
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.setRequestMethod("POST");
+        urlConnection.setRequestProperty("Content-Type","text/xml; charset=utf-8");
+        urlConnection.setRequestProperty("SOAPAction","http://WebXml.com.cn/getMobileCodeInfo");
+        //打开通信
+        urlConnection.setDoInput(true);
+        urlConnection.setDoOutput(true);
+        String xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                "<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
+                "  <soap:Body>\n" +
+                "    <getMobileCodeInfo xmlns=\"http://WebXml.com.cn/\">\n" +
+                "      <mobileCode>13207653789</mobileCode>\n" +
+                "      <userID></userID>\n" +
+                "    </getMobileCodeInfo>\n" +
+                "  </soap:Body>\n" +
+                "</soap:Envelope>";
+        urlConnection.getOutputStream().write(xml.getBytes());
 
+        String resultString ;
+        BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(),"UTF-8"));
+        StringBuilder stringBuilder = new StringBuilder();
+        while ((resultString = reader.readLine()) != null) {
+            stringBuilder.append(resultString);
+        }
+        if (null != reader) {
+            reader.close();
+        }
+        System.out.println(stringBuilder.toString());
+    }
 
 
     /**
