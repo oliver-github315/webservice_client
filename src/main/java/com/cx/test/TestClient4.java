@@ -56,18 +56,32 @@ public class TestClient4 {
                 "    </getMobileCodeInfo>\n" +
                 "  </soap:Body>\n" +
                 "</soap:Envelope>";
-        urlConnection.getOutputStream().write(xml.getBytes());
-
-        String resultString ;
-        BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(),"UTF-8"));
-        StringBuilder stringBuilder = new StringBuilder();
-        while ((resultString = reader.readLine()) != null) {
-            stringBuilder.append(resultString);
+        OutputStream os = urlConnection.getOutputStream();
+        os.write(xml.getBytes());
+        InputStream is = urlConnection.getInputStream();
+        //方式一
+//        String resultString ;
+//        BufferedReader reader = new BufferedReader(new InputStreamReader(is,"UTF-8"));
+//        StringBuilder stringBuilder = new StringBuilder();
+//        while ((resultString = reader.readLine()) != null) {
+//            stringBuilder.append(resultString);
+//        }
+//        if (null != reader) {
+//            reader.close();
+//        }
+        //方式二
+        byte[] b = new byte[1024];
+        int len = 0;
+        String s = "";
+        while( (len = is.read(b))!=-1 ){
+            String ss = new String(b,0,len,"UTF-8");
+            s += ss;
         }
-        if (null != reader) {
-            reader.close();
-        }
-        System.out.println(stringBuilder.toString());
+        is.close();
+        os.close();
+        urlConnection.disconnect();
+//        System.out.println(stringBuilder.toString());
+        System.out.println(s);
     }
 
 
